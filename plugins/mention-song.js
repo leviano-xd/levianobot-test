@@ -3,7 +3,7 @@ const path = require('path');
 
 // Song source priority: assets/song.mp3 > SONG_URL env > default URL below
 const SONG_FILE = path.join(__dirname, '..', 'assets', 'song.mp3');
-const DEFAULT_SONG_URL = 'https://xenocdn.xenocdn.workers.dev/696954c0.mpeg';
+const DEFAULT_SONG_URL = 'https://galaxy.anuansad50.workers.dev/f/audio_mp3-1792952609016.mp3';
 const COOLDOWN_MS = 60 * 1000; // same person can trigger once per minute
 const lastSent = new Map();
 
