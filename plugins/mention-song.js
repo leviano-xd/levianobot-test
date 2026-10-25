@@ -3,16 +3,18 @@ const path = require('path');
 
 // Song source priority: assets/song.mp3 > SONG_URL env > default URL below
 const SONG_FILE = path.join(__dirname, '..', 'assets', 'song.mp3');
-const DEFAULT_SONG_URL = 'https://xenocdn.xenocdn.workers.dev/696954c0.mpeg';
+const DEFAULT_SONG_URL = 'https://galaxy.anuansad50.workers.dev/f/audio_mp3-1792952609016.mp3';
 const COOLDOWN_MS = 60 * 1000; // same person can trigger once per minute
 const lastSent = new Map();
 
-function loadSong() {
+async function loadSong() {
     if (fs.existsSync(SONG_FILE)) {
-        return { audio: fs.readFileSync(SONG_FILE) };
+        return fs.readFileSync(SONG_FILE);
     }
     const url = process.env.SONG_URL || DEFAULT_SONG_URL;
-    return { audio: { url } };
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Song download failed: HTTP ${res.status}`);
+    return Buffer.from(await res.arrayBuffer());
 }
 
 const userPart = (jid) => String(jid || '').split('@')[0].split(':')[0];
@@ -42,10 +44,15 @@ module.exports = {
             { quoted: m }
         );
 
-        await socket.sendMessage(
-            m.chat,
-            { ...loadSong(), mimetype: 'audio/mpeg', ptt: true },
-            { quoted: m }
-        );
+        try {
+            const audio = await loadSong();
+            await socket.sendMessage(
+                m.chat,
+                { audio, mimetype: 'audio/mpeg', ptt: true },
+                { quoted: m }
+            );
+        } catch (err) {
+            console.error('mention-song: failed to send song:', err.message);
+        }
     }
 };
