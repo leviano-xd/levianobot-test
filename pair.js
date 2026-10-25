@@ -216,7 +216,7 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
         handleMessageRevocation(socket, sanitizedNumber);
-        registerCommands(socket, plugins, config.PREFIX, sanitizedNumber);
+        registerCommands(socket, plugins, config, sanitizedNumber);
 
         if (!socket.authState.creds.registered) {
             let code;
