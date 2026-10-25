@@ -6,6 +6,9 @@ const pino = require('pino');
 const moment = require('moment-timezone');
 const crypto = require('crypto');
 const db = require('./lib/db');
+const { loadPlugins, registerCommands } = require('./lib/commands');
+
+const plugins = loadPlugins(path.join(__dirname, 'plugins'));
 const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -203,6 +206,7 @@ async function EmpirePair(number, res) {
 
         setupAutoRestart(socket, sanitizedNumber);
         handleMessageRevocation(socket, sanitizedNumber);
+        registerCommands(socket, plugins, config.PREFIX, sanitizedNumber);
 
         if (!socket.authState.creds.registered) {
             let code;
