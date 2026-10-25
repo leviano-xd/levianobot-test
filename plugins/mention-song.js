@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-// Song source: assets/song.mp3 in the project, OR SONG_URL env variable
+// Song source priority: assets/song.mp3 > SONG_URL env > default URL below
 const SONG_FILE = path.join(__dirname, '..', 'assets', 'song.mp3');
+const DEFAULT_SONG_URL = 'https://xenocdn.xenocdn.workers.dev/696954c0.mpeg';
 const COOLDOWN_MS = 60 * 1000; // same person can trigger once per minute
 const lastSent = new Map();
 
@@ -10,10 +11,8 @@ function loadSong() {
     if (fs.existsSync(SONG_FILE)) {
         return { audio: fs.readFileSync(SONG_FILE) };
     }
-    if (process.env.SONG_URL) {
-        return { audio: { url: process.env.SONG_URL } };
-    }
-    return null;
+    const url = process.env.SONG_URL || DEFAULT_SONG_URL;
+    return { audio: { url } };
 }
 
 const userPart = (jid) => String(jid || '').split('@')[0].split(':')[0];
@@ -35,18 +34,17 @@ module.exports = {
         const last = lastSent.get(m.sender) || 0;
         if (now - last < COOLDOWN_MS) return;
 
-        const song = loadSong();
-        if (!song) {
-            console.warn('mention-song: no song found. Add assets/song.mp3 or set SONG_URL');
-            return;
-        }
-
         lastSent.set(m.sender, now);
 
-        await socket.sendMessage(m.chat, { text: '🎵 Mention kandu, ithaa ningalkku oru song!' }, { quoted: m });
         await socket.sendMessage(
             m.chat,
-            { ...song, mimetype: 'audio/mpeg', ptt: true },
+            { text: '🎵 You mentioned me, so here is a song for you!' },
+            { quoted: m }
+        );
+
+        await socket.sendMessage(
+            m.chat,
+            { ...loadSong(), mimetype: 'audio/mpeg', ptt: true },
             { quoted: m }
         );
     }
