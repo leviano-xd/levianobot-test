@@ -26,7 +26,7 @@ const config = {
     PREFIX: '.',
     MAX_RETRIES: 3,
     GROUP_INVITE_LINK: 'https://chat.whatsapp.com/xxxxxxx',
-    RCD_IMAGE_PATH: 'https://i.ibb.co/xxxxxx.png',
+    RCD_IMAGE_PATH: process.env.RCD_IMAGE_PATH || 'https://your-real-image-link.png',
     OTP_EXPIRY: 300000,
     OWNER_NUMBER: 'YOUR-NUMBER'
 };
@@ -43,6 +43,19 @@ const sanitize = (number) => String(number).replace(/[^0-9]/g, '');
 
 function formatMessage(title, content, footer) {
     return `*${title}*\n\n${content}\n\n> *${footer}*`;
+}
+
+// Sends an image with caption. If the image fails to load, sends plain text instead
+async function sendWithImage(socket, jid, caption) {
+    try {
+        return await socket.sendMessage(jid, {
+            image: { url: config.RCD_IMAGE_PATH },
+            caption
+        });
+    } catch (err) {
+        console.warn('Image send failed, sending text instead:', err.message);
+        return await socket.sendMessage(jid, { text: caption });
+    }
 }
 
 function generateOTP() {
@@ -85,10 +98,7 @@ function handleMessageRevocation(socket, number) {
         );
 
         try {
-            await socket.sendMessage(userJid, {
-                image: { url: config.RCD_IMAGE_PATH },
-                caption: message
-            });
+            await sendWithImage(socket, userJid, message);
             console.log(`Notified ${number} about message deletion: ${messageKey.id}`);
         } catch (error) {
             console.error('Failed to send deletion notification:', error);
@@ -251,14 +261,15 @@ async function EmpirePair(number, res) {
 
                 activeSockets.set(sanitizedNumber, socket);
 
-                await socket.sendMessage(userJid, {
-                    image: { url: config.RCD_IMAGE_PATH },
-                    caption: formatMessage(
+                await sendWithImage(
+                    socket,
+                    userJid,
+                    formatMessage(
                         config.BOT_NAME,
                         `✅ Successfully connected!\n\n🔢 Number: ${sanitizedNumber}\n`,
                         config.BOT_FOOTER
                     )
-                });
+                );
             } catch (error) {
                 console.error('Connection error:', error);
             }
@@ -438,14 +449,15 @@ router.get('/verify-otp', async (req, res) => {
 
         const socket = activeSockets.get(sanitizedNumber);
         if (socket) {
-            await socket.sendMessage(jidNormalizedUser(socket.user.id), {
-                image: { url: config.RCD_IMAGE_PATH },
-                caption: formatMessage(
+            await sendWithImage(
+                socket,
+                jidNormalizedUser(socket.user.id),
+                formatMessage(
                     '📌 CONFIG UPDATED',
                     'Your configuration has been successfully updated!',
                     config.BOT_FOOTER
                 )
-            });
+            );
         }
         res.status(200).send({ status: 'success', message: 'Config updated successfully' });
     } catch (error) {
