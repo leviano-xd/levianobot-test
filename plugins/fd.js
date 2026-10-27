@@ -4,8 +4,6 @@ const CHANNEL_LINK_RE = /whatsapp\.com\/channel\/([A-Za-z0-9_-]+)/i;
 
 const userPart = (jid) => String(jid || '').split('@')[0].split(':')[0];
 
-// Accepts a channel JID (120363xxxx@newsletter), a bare channel ID (120363xxxx),
-// or a channel invite link (https://whatsapp.com/channel/xxxx)
 async function resolveChannelJid(socket, input) {
     if (/^\d+@newsletter$/.test(input)) return input;
     if (/^\d+$/.test(input)) return `${input}@newsletter`;
@@ -15,11 +13,9 @@ async function resolveChannelJid(socket, input) {
         const info = await socket.newsletterMetadata('invite', link[1]);
         return info.id;
     }
-
     return null;
 }
 
-// Downloads the audio from the replied-to message
 async function downloadQuotedAudio(quoted) {
     const stream = await downloadContentFromMessage(quoted.msg, 'audio');
     let buffer = Buffer.from([]);
@@ -35,7 +31,6 @@ module.exports = {
     commands: ['fd'],
 
     async run({ socket, m, args, config }) {
-        // Only the bot itself or the owner can use this command
         if (!m.fromMe && userPart(m.sender) !== userPart(config.OWNER_NUMBER)) return;
 
         const reply = (text) =>
@@ -71,16 +66,23 @@ module.exports = {
 
         try {
             const song = await downloadQuotedAudio(quoted);
-            await socket.sendMessage(jid, {
+            const sent = await socket.sendMessage(jid, {
                 audio: song.audio,
                 mimetype: song.mimetype,
                 ptt: true
             });
-            console.log(`fd: forwarded audio to ${jid}`);
-            return reply(`✅ Audio forwarded to channel: *${jid}*`);
+
+            // Logged so we can see whether WhatsApp actually accepted the message
+            console.log(`fd: sent to ${jid}, message key:`, JSON.stringify(sent?.key));
+
+            return reply(
+                `✅ Sent to channel: *${jid}*\n` +
+                `🆔 Message ID: ${sent?.key?.id || 'none'}\n\n` +
+                `Channel-il kaanunnundo ennu nokkuka.`
+            );
         } catch (err) {
             console.error('fd: failed to send to channel:', err);
-            return reply('❌ Failed to send the audio to the channel. Please check the logs.');
+            return reply(`❌ Failed to send to channel: ${err.message}`);
         }
     }
 };
