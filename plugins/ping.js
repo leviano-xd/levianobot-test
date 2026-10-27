@@ -1,15 +1,28 @@
 module.exports = {
     name: 'ping',
-    description: 'Checks if the bot is alive and how fast it replies',
+    description: 'Checks bot speed with an animated loader',
     commands: ['ping'],
 
-    async run({ m }) {
-        const now = Date.now();
-        const messageTime = Number(m.messageTimestamp) * 1000;
-        const delay = messageTime ? Math.max(0, now - messageTime) : null;
+    async run({ socket, m }) {
+        const start = Date.now();
 
-        await m.reply(
-            `🏓 *Pong!*\n\n⚡ Reply delay: ${delay !== null ? delay + ' ms' : 'unknown'}`
+        const loading = await socket.sendMessage(
+            m.chat,
+            { text: '*𝗧𝗘𝗦𝗧𝗜𝗡𝗚 𝗟𝗘𝗩𝗜𝗔𝗡𝗢 𝗕𝗢𝗧*' },
+            { quoted: m }
         );
+
+        const stages = ['*○○○○', '**○○○', '***○○', '****○', '*****'];
+        for (const stage of stages) {
+            await socket.sendMessage(m.chat, { text: stage, edit: loading.key });
+            await new Promise((r) => setTimeout(r, 250));
+        }
+
+        const ping = Date.now() - start;
+
+        await socket.sendMessage(m.chat, {
+            text: `📌𝙿𝚒𝚗𝚐 ${ping}`,
+            edit: loading.key
+        });
     }
 };
