@@ -8,9 +8,10 @@
 //    5. Handles invalid options gracefully
 // =========================================================================
 
-const MENU_MARKERS = ['REPLY THIS MESSAGE WITH A NUMBER', 'SELECT A SUB-MENU', 'SUPUN YT BOT'];
+const BOT_TITLE = 'LEVIANO BOT';
+const MENU_MARKERS = ['REPLY THIS MESSAGE WITH A NUMBER', 'SELECT A SUB-MENU', BOT_TITLE];
 
-const MAIN_MENU_TEXT = `╭───〔 *SUPUN YT BOT* 〕───⊷
+const MAIN_MENU_TEXT = `╭───〔 *${BOT_TITLE}* 〕───⊷
 │ 👤 *User:* @sender
 │ ⚙️ *Prefix:* [ . ]
 │ ⏰ *Time:* 05:21 PM
@@ -29,14 +30,14 @@ const MAIN_MENU_TEXT = `╭───〔 *SUPUN YT BOT* 〕───⊷
 │ 💡 _Swipe right & reply with 1, 2, 3..._
 ╰────────────────────────⊷
 
-> ⚡  > ɪᴛᴢ ᴍᴇ ᴍʀ.ꜱᴜᴘᴜɴ ꜰᴇʀɴᴀɴᴅᴏヤ`;
+> ⚡  > ʟᴇᴠɪᴀɴᴏ ʙᴏᴛ`;
 
 const SUB_MENUS = {
     '1': {
-        title: 'SUPUN YT BOT - Download Menu',
+        title: `${BOT_TITLE} - Download Menu`,
         body: 'Category: DOWNLOADERS',
         text: `╭───〔 *📥 DOWNLOAD MENU* 〕───⊷
-│ 🤖 *Bot:* SUPUN YT BOT
+│ 🤖 *Bot:* ${BOT_TITLE}
 │ 📂 *Category:* DOWNLOADERS
 │ 📝 *Info:* Download audio, video & media from social platforms
 ├───〔 📋 *COMMANDS LIST* 〕───⊷
@@ -51,10 +52,10 @@ const SUB_MENUS = {
 ╰────────────────────────⊷`
     },
     '2': {
-        title: 'SUPUN YT BOT - AI & Search Menu',
+        title: `${BOT_TITLE} - AI & Search Menu`,
         body: 'Category: ARTIFICIAL INTELLIGENCE',
         text: `╭───〔 *🤖 AI & SEARCH MENU* 〕───⊷
-│ 🤖 *Bot:* SUPUN YT BOT
+│ 🤖 *Bot:* ${BOT_TITLE}
 │ 📂 *Category:* ARTIFICIAL INTELLIGENCE
 │ 📝 *Info:* Smart AI assistants, text & image generators
 ├───〔 📋 *COMMANDS LIST* 〕───⊷
@@ -68,10 +69,10 @@ const SUB_MENUS = {
 ╰────────────────────────⊷`
     },
     '3': {
-        title: 'SUPUN YT BOT - Group Admin Menu',
+        title: `${BOT_TITLE} - Group Admin Menu`,
         body: 'Category: GROUP MANAGEMENT',
         text: `╭───〔 *👥 GROUP ADMIN MENU* 〕───⊷
-│ 🤖 *Bot:* SUPUN YT BOT
+│ 🤖 *Bot:* ${BOT_TITLE}
 │ 📂 *Category:* GROUP MANAGEMENT
 │ 📝 *Info:* Automated administrative commands for WhatsApp groups
 ├───〔 📋 *COMMANDS LIST* 〕───⊷
@@ -86,10 +87,10 @@ const SUB_MENUS = {
 ╰────────────────────────⊷`
     },
     '4': {
-        title: 'SUPUN YT BOT - Tools & Converters',
+        title: `${BOT_TITLE} - Tools & Converters`,
         body: 'Category: UTILITIES & TOOLS',
         text: `╭───〔 *🛠️ TOOLS & CONVERTERS* 〕───⊷
-│ 🤖 *Bot:* SUPUN YT BOT
+│ 🤖 *Bot:* ${BOT_TITLE}
 │ 📂 *Category:* UTILITIES & TOOLS
 │ 📝 *Info:* Useful utility tools, stickers & format converters
 ├───〔 📋 *COMMANDS LIST* 〕───⊷
@@ -103,10 +104,10 @@ const SUB_MENUS = {
 ╰────────────────────────⊷`
     },
     '5': {
-        title: 'SUPUN YT BOT - Owner & Settings Menu',
+        title: `${BOT_TITLE} - Owner & Settings Menu`,
         body: 'Category: OWNER & SYSTEM',
         text: `╭───〔 *👑 OWNER & SETTINGS MENU* 〕───⊷
-│ 🤖 *Bot:* SUPUN YT BOT
+│ 🤖 *Bot:* ${BOT_TITLE}
 │ 📂 *Category:* OWNER & SYSTEM
 │ 📝 *Info:* Bot owner exclusive control and configuration
 ├───〔 📋 *COMMANDS LIST* 〕───⊷
@@ -142,7 +143,7 @@ async function sendMainMenu(socket, m) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363399205146445@newsletter',
-                newsletterName: 'SUPUN YT BOT Official Updates',
+                newsletterName: `${BOT_TITLE} Official Updates`,
                 serverMessageId: 1
             }
         }
